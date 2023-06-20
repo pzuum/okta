@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { OAuthParamDTO } from 'src/oauth-param.dto';
 import { OAuthRunnerService
@@ -21,6 +21,14 @@ export class OAuthController {
     @Get('logout/:provider')
     logout(@Param() {provider}: OAuthParamDTO): void {
     return OAuthRunnerService.logout(provider);
+}
+
+@UseGuards()
+@Get('/protected')
+protected(@Res() res: Response)  {
+
+    res.render('protected');
+    return
 }
 
 
