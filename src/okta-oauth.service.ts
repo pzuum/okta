@@ -2,18 +2,15 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { Response } from "express";
 import { AuthService, OAuthPayload } from "src/oauth.types";
+import { OktaOAuthURIService } from "src/okta-oauth-URI.service";
 import { staticImplements } from "src/static-implements";
 
 @staticImplements<AuthService>()
 export class OktaOAuthService {
     static login(loginPayload: OAuthPayload, res: Response) {
         if (loginPayload) {
-            res.redirect(loginPayload?.authProviderURI +
-                `&client_id=${loginPayload?.clientID}&` +
-                'response_type=code&' +
-                'response_mode=query&' +
-                'scope=openid%20profile&' +
-                `redirect_uri=${loginPayload?.redirectURI}&`);
+            const url = OktaOAuthURIService.run(loginPayload);            
+            res.redirect(url);
         }
 
         throw new BadRequestException('No payload provided');
