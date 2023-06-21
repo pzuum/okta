@@ -1,7 +1,7 @@
 import { OAuthPayload } from "src/oauth.types";
 
 export class OktaOAuthURIService {
-    static run = (loginPayload: OAuthPayload ): string => {
+    static createUrl = (loginPayload: OAuthPayload ): string => {
         
 
         const url = new URL(loginPayload?.authProviderURI);
