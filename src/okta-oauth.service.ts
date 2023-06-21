@@ -9,7 +9,7 @@ import { staticImplements } from "src/static-implements";
 export class OktaOAuthService {
     static login(loginPayload: OAuthPayload, res: Response) {
         if (loginPayload) {
-            const url = OktaOAuthURIService.run(loginPayload);            
+            const url = OktaOAuthURIService.createUrl(loginPayload);            
             res.redirect(url);
         }
 
