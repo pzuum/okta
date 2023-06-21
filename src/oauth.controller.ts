@@ -8,17 +8,16 @@ import { OAuthRunnerService
 export class OAuthController {
 
   
-  @Get('login/:provider')
-  login(@Param() {provider}: OAuthParamDTO, @Res() res: Response): void {
+@Get('login/:provider')
+    login(@Param() {provider}: OAuthParamDTO, @Res() res: Response): void {
     return OAuthRunnerService.login(provider, res);
 }
 
-  @Get('callback/:provider')
+@Get('callback/:provider')
     callback(@Param() {provider}: OAuthParamDTO, @Query('code') code: string): void {
     return OAuthRunnerService.callback(provider, code);
 }
-
-    @Get('logout/:provider')
+@Get('logout/:provider')
     logout(@Param() {provider}: OAuthParamDTO): void {
     return OAuthRunnerService.logout(provider);
 }
@@ -26,12 +25,10 @@ export class OAuthController {
 @UseGuards()
 @Get('/protected')
 protected(@Res() res: Response)  {
-
-    res.render('protected');
+    res.json({
+        message: 'protected',
+    })
     return
 }
-
-
-
 
 }

@@ -9,7 +9,7 @@ export class OktaOAuthService {
     static login(loginPayload: OAuthPayload, res: Response) {
         if (loginPayload) {
             res.redirect(loginPayload?.authProviderURI +
-                `client_id=${loginPayload?.clientID}&` +
+                `&client_id=${loginPayload?.clientID}&` +
                 'response_type=code&' +
                 'response_mode=query&' +
                 'scope=openid%20profile&' +
