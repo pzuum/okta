@@ -1,73 +1,35 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
   <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
   [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- In order to make Oauth we're going to need a sequence of flows. First we need to redirect the user to the correct url to get the authorizationCode from the /authorize in the Authorization server.
+- put the  code_challenge as query parameter and that should  be generated on the front-end (there is an example on how to do it below). To increase security generate a random 32 chars in length and send it in the `state` query param.
 
-## Installation
+###
 
-```bash
-$ npm install
+``` GET /authorize/{AuthServerName}/?codeChallenge={codeChallenge}&state={state} ```
+
+###
+
+- The user will be redirected to the IDp (identity provider). User will authenticate if needed in the IDp and will be redirected to the app with the `authorization code` . `{frontend_redirectURL}/?authorizationCode={authorizationCode}&state={state}`
+- In the frontend This `authorization_code` should be sent to the backend  with the code_verifier in an POST request. `POST /token/{AuthServerName}/ body: { "code_verifier": 1232131313232132131321321312, "authorizationCode": "authorizationCode"}`
+- Response to `/token` will contain `access_token` and `ID_token` from Zuum API.
+
+** In all Auth provider we have a key called code_verifier and other called code_challenge. `code_verifier` is a random generated string with 32 chars in length. `code_challenge` is the `code_verifier` after it is hashed and digested in base64 replacing the unsuporte chars.
+
+### Generate code_verifier and code challenge with @Okta/okta-auth-js and createHash from crypto API ###
+
+```
+const code_verifier = new OktaAuth(
+            {
+                issuer: loginPayload?.authProviderURI,
+                clientId: loginPayload?.clientID,
+                redirectUri: loginPayload?.redirectURI,
+            }
+        ).pkce.generateVerifier(code);
+        const code_challenge = createHash('sha256').update(code_verifier).digest('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 ```
 
-## Running the app
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+### GET /authorize/ ###

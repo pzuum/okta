@@ -1,17 +1,27 @@
-import { Response } from "express";
 import { OauthResolver } from "src/oauth-resolver";
-import { OAuthProvider } from "src/oauth.types";
+import { OAuthProvider, CallbackResponse } from "src/oauth.types";
 
 
 export class OAuthRunnerService  {
-    static login(authProvider: OAuthProvider, res: Response ): void {
+    static login(authProvider: OAuthProvider, codeChallenge: string): string {
         const loginPayload = OauthResolver[authProvider]?.getOAuthConfig();
-        OauthResolver[authProvider].login(loginPayload, res);
+        return OauthResolver[authProvider].login(loginPayload, codeChallenge);
     }
-    static callback(authProvider: OAuthProvider, code?: string): void {
-        OauthResolver[authProvider]?.callback(code);
+    
+
+    static callbackAndEncrypt(authProvider: OAuthProvider, code?: string): CallbackResponse  {
+        return OauthResolver[authProvider]?.callbackAndEncrypt(code);
     }
+
+    
+
     static logout(authProvider: OAuthProvider): void {
         OauthResolver[authProvider]?.logout();
     }
+
+    static async  token(authProvider: OAuthProvider, authorizationCode: string, code_verifier: string): Promise<string> {
+        return OauthResolver[authProvider]?.token(authorizationCode, code_verifier);
+        
+    }
+
 }

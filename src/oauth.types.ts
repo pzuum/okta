@@ -17,14 +17,39 @@ export type OAuthPayload = Record<string, string> &  {
     redirectURI: string;
     clientID: string;
     authProviderURI: string;
+    tokenURI: string;
+    code_verifier?: string;
+
+}
+
+export type OAuthTokenPayload = {
+    codeVerifier: string;
+    authorizationCode: string;
+
+
+}
+
+export type OAuthCallbackQuery = {
+    code?: string;
+    state?: string;
+    error_description?: string;
 }
 
 
+
+export type OAuthQueryPKCE = {
+    code: string;
+}
+
+export type CallbackResponse = Promise<string> | string;
+
+
 export interface AuthService {
-    login(loginPayload: OAuthPayload, res: Response): void;
-    callback(code?: string): void;
+    login(loginPayload: OAuthPayload, code: string): string;
     getOAuthConfig(): OAuthPayload;
     logout?(): void;
+    token?(code: string, code_verifier: string): Promise<string>;
+    callbackAndEncrypt?(code?: string): CallbackResponse;
 }
 
 

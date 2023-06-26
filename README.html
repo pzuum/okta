@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Description</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+        
+    </head>
+    <body class="vscode-body vscode-light">
+          <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
+  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+<h2 id="description">Description</h2>
+<ul>
+<li>In order to make Oauth we're going to need a sequence of flows. First we need to redirect the user to the correct url to get the authorizationCode from the /authorize in the Authorization server.</li>
+<li>put the  code_challenge as query parameter and that should  be generated on the front-end (there is an example on how to do it below). To increase security generate a random 32 chars in length and send it in the <code>state</code> query param. <code>GET /authorize/{AuthServerName}/?codeChallenge={codeChallenge}&amp;state={state}</code></li>
+<li>The user will be redirected to the IDp (identity provider). User will authenticate if needed in the IDp and will be redirected to the app with the authorization code. <code>{frontend_redirectURL}/?authorizationCode={authorizationCode}&amp;state={state}</code></li>
+<li>In the frontend This code should be sent to the backend  with the code_verifier with an POST request. <code>POST /token/{AuthServerName}/ body: { &quot;code_verifier&quot;: 1232131313232132131321321312, &quot;authorizationCode&quot;: &quot;authorizationCode&quot;}</code></li>
+<li>the response to <code>/token</code> will contain <code>access_token</code> and <code>ID_token</code> from Zuum API.</li>
+</ul>
+<p>** In all Auth provider we have a key called code_verifier and other called code_challenge. <code>code_verifier</code> is a random generated string with 32 chars in length. <code>code_challenge</code> is the code_verifier after it is hashed and digested in base64 replacing the unsuporte chars.</p>
+<h3 id="generate-code_verifier-and-code-challenge-with-oktaokta-auth-js">Generate code_verifier and code challenge with @Okta/okta-auth-js</h3>
+<pre><code>const code_verifier = new OktaAuth(
+            {
+                issuer: loginPayload?.authProviderURI,
+                clientId: loginPayload?.clientID,
+                redirectUri: loginPayload?.redirectURI,
+            }
+        ).pkce.generateVerifier(code);
+        const code_challenge = createHash('sha256').update(code_verifier).digest('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+</code></pre>
+<h3 id="get-authorize">GET /authorize/</h3>
+<pre><code>
+
+</code></pre>
+
+        
+        
+    </body>
+    </html>
