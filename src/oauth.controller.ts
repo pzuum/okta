@@ -23,10 +23,9 @@ export class OAuthController {
         return
     }
     
-    const code = await EncryptService.DigestSHA256(query.code);
     
         
-    res.redirect(`${process.env.FRONTEND_URL}/?code=${code}&state=${query.state}&provider=${provider}`);
+    res.redirect(`${process.env.FRONTEND_URL}/?code=${query.code}&state=${query.state}&provider=${provider}`);
     
 }
 
