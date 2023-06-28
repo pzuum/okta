@@ -3,9 +3,9 @@ import { OAuthProvider, CallbackResponse } from "src/oauth.types";
 
 
 export class OAuthRunnerService  {
-    static login(authProvider: OAuthProvider, codeChallenge: string): string {
+    static login(authProvider: OAuthProvider, codeChallenge: string, state:string ): string {
         const loginPayload = OauthResolver[authProvider]?.getOAuthConfig();
-        return OauthResolver[authProvider].login(loginPayload, codeChallenge);
+        return OauthResolver[authProvider].login(loginPayload, codeChallenge, state);
     }
     
 

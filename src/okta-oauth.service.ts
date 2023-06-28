@@ -7,9 +7,9 @@ import { staticImplements } from "src/static-implements";
 
 @staticImplements<AuthService>()
 export class OktaOAuthService {
-    static login(loginPayload: OAuthPayload, codeChallenge: string) {
+    static login(loginPayload: OAuthPayload, codeChallenge: string, state: string) {
         if (loginPayload) {
-            return OktaOAuthURIService.login(loginPayload, codeChallenge);            
+            return OktaOAuthURIService.login(loginPayload, codeChallenge, state);            
         }
 
         throw new BadRequestException('No payload provided');
@@ -31,6 +31,7 @@ export class OktaOAuthService {
             redirectURI: process.env.OKTA_REDIRECT_URI,
             authProviderURI: process.env.OKTA_AUTH_PROVIDER_URI,
             tokenURI: process.env.OKTA_AUTH_TOKEN_URI,
+            userInfoURI: `${process.env.OKTA_BASE_URI}/oauth2/v1/userinfo`
         }
     }
 
@@ -40,9 +41,10 @@ export class OktaOAuthService {
 
     static async token(code: string, code_verifier: string): Promise<string> {
         const config = this.getOAuthConfig();
+        console.log({code, code_verifier})
         const data = await OktaOAuthURIService.getToken({code, code_verifier, ...config});
-        
-        return data as string;
+        const userInfo  = await OktaOAuthURIService.getUserInfo(config.userInfoURI, data.access_token);
+        return userInfo;
 
  
     }
